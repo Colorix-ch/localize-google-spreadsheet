@@ -7,8 +7,9 @@ const Gs2File = function(reader, writer) {
   this._writer = writer
 }
 
-Gs2File.fromGoogleSpreadsheet = async function(apiKey, spreadsheetKey, sheets) {
-  const reader = await GSReader.builder(apiKey, spreadsheetKey, sheets)
+// We use Service Account instead of API Key
+Gs2File.fromGoogleSpreadsheet = async function(serviceAccountCredentialsFilePath, spreadsheetKey, sheets) {
+  const reader = await GSReader.builder(serviceAccountCredentialsFilePath, spreadsheetKey, sheets)
 
   return new Gs2File(
     reader,

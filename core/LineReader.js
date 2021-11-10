@@ -2,19 +2,20 @@ const Line = require('./Line.js')
 const { GoogleSpreadsheet } = require('google-spreadsheet')
 const Q = require('q')
 
-const GSReader = function(spreadsheetKey, sheetsFilter) {
+const GSReader = function(serviceAccountCredentials, spreadsheetKey, sheetsFilter) {
   this._sheet = new GoogleSpreadsheet(spreadsheetKey)
+  // We use Service Account instead of API Key
+  this._sheet.useServiceAccountAuth(serviceAccountCredentials)
   this._sheetsFilter = sheetsFilter
-
+  
   this._fetchDeferred = Q.defer()
   this._isFetching = false
   this._fetchedWorksheets = null
 }
 
-GSReader.builder = async function(apiKey, spreadsheetKey, sheetsFilter) {
-  const reader = new GSReader(spreadsheetKey, sheetsFilter)
-  await reader._sheet.useApiKey(apiKey)
-
+GSReader.builder = async function(serviceAccountCredentialsFilePath, spreadsheetKey, sheetsFilter) {
+  const creds = require(serviceAccountCredentialsFilePath)
+  const reader = new GSReader(creds, spreadsheetKey, sheetsFilter)
   return reader
 }
 
@@ -26,7 +27,7 @@ GSReader.prototype.fetchAllCells = async function() {
       self._isFetching = true
 
       try {
-        await self._sheet.loadInfo()
+            await self._sheet.loadInfo()
       } catch (err) {
         console.error('Error while fetching the Spreadsheet (' + err + ')')
         console.warn('WARNING! Check that your spreadsheet is "Published" in "File > Publish to the web..."')
@@ -79,9 +80,11 @@ GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol)
   if (headers) {
     let keyIndex = -1
     let valIndex = -1;
+    // If the translation is empty then replace it by the EN default
+    let defauldValIndex = -1
 
     for (let i = 0; i < headers.length; i++) {
-      const value = headers[i].value;
+      var value = headers[i].value;
 
       if (value === keyCol) {
         keyIndex = i;
@@ -89,16 +92,22 @@ GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol)
       if (value === valCol) {
         valIndex = i;
       }
+      if (value === 'EN') {
+        defauldValIndex = i;
+      }
     }
     for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
+      var row = rows[i];
 
       if (row) {
         try {
-          const keyValue = row[keyIndex].value;
-          const valValue = row[valIndex].value;
+          var keyValue = row[keyIndex].value;
+          var valValue = row[valIndex].value;
 
           if (keyValue) {
+            if (!valValue) {
+              valValue = row[defauldValIndex].value;
+            }
             results.push(new Line(keyValue, valValue));
           }
 
