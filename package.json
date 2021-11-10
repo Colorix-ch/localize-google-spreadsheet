@@ -1,15 +1,12 @@
 {
-  "author": {
-    "name": "Michael Caraccio",
-    "email": "michael.caraccio@colorix.com"
-  },
-  "name": "localize-google-spreadsheet",
+  "author": "Michael Caraccio <michael.caraccio@colorix.com>",
+  "name": "@colorix/localize-google-spreadsheet",
   "description": "Create a localization file in Android or iOS format from a Google Spreadsheet. Fork from version 2 by Pavel Sorokin",
   "version": "3.5.0",
   "homepage": "https://github.com/Colorix-ch/localize-google-spreadsheet",
   "repository": {
     "type": "git",
-    "url": "git@github.com:Colorix-ch/localize-google-spreadsheet.git"
+    "url": "git+ssh://git@github.com/Colorix-ch/localize-google-spreadsheet.git"
   },
   "main": "index.js",
   "dependencies": {
@@ -17,8 +14,24 @@
     "q": "0.9.2",
     "mkpath": "0.1.0"
   },
-  "readmeFilename": "README.md",
   "scripts": {
     "test": "./tests/all.js"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/Colorix-ch/localize-google-spreadsheet/issues"
+  },
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "google",
+    "spreadsheets",
+    "api",
+    "localization",
+    "android",
+    "ios"
+  ],
+  "license": "ISC"
 }
