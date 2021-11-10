@@ -1,28 +1,31 @@
-# Convert a Google Spreadsheet to a localization file. Version 2
+# Convert a Google Spreadsheet to a localization file
+
+Fork : [NeverwinterMoon/localize-with-spreadsheet-2](https://github.com/NeverwinterMoon/localize-with-spreadsheet-2)
 
 ## Installation
 
-`npm install localize-with-spreadsheet-2`
+`npm install @colorix/localize-google-spreadsheet`
 
-## Differences in version 2 (only major ones listed)
+## Differences
 
-- Preserve line breaks from the Google Sheets
-- Uses newer version of `google-spreadsheet` which in turn supports the Google Sheets v4 API
+- Authentication with Service Account instead of API key
 
 ## Example
 
 Requires:
 
-- API key (https://theoephraim.github.io/node-google-spreadsheet/#/getting-started/authentication?id=api-key)
+- Authentication with Service Account [How-to](https://theoephraim.github.io/node-google-spreadsheet/#/getting-started/authentication?id=service-account)
+- API key **not supported anymore** 
 - Spreadsheet key
 - Sheet name filter
 
 Create a file `update-localization.js`
 
 ```javascript
-const Localize = require('localize-with-spreadsheet-2')
+const Localize = require('@colorix/localize-google-spreadsheet')
 
-Localize.fromGoogleSpreadsheet('[api-key]', '[spreadsheet-key]', '*')
+Localize.fromGoogleSpreadsheet("./config/myapp-1dd646d7c2af.json", 'YOUR-DOC-ID', ['YOUR-TAB-NAME']) // tab name can be *
+
   .then(localizer => {
     localizer.setKeyCol('KEY') // name of the column containing the translation key
 
@@ -41,10 +44,6 @@ Run it with
 You can filter the worksheets to include with the third parameter of 'fromGoogleSpreadsheet':
 
 ```
-Localize.fromGoogleSpreadsheet('[api-key]', '[spreadsheet-key]', '*')
-Localize.fromGoogleSpreadsheet('[api-key]', '[spreadsheet-key]', '[mobile-app]')
+Localize.fromGoogleSpreadsheet('your-json-file', 'YOUR-DOC-ID', '*')
+Localize.fromGoogleSpreadsheet('your-json-file', 'YOUR-DOC-ID', '[mobile-app]')
 ```
-
-## Notes
-
-- The script will preserve everything that is above the tags: < !-- AUTO-GENERATED --> or // AUTO-GENERATED
