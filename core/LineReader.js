@@ -2,20 +2,23 @@ const Line = require('./Line.js')
 const { GoogleSpreadsheet } = require('google-spreadsheet')
 const Q = require('q')
 
-const GSReader = function(serviceAccountCredentials, spreadsheetKey, sheetsFilter) {
+const GSReader = function (spreadsheetKey, sheetsFilter) {
   this._sheet = new GoogleSpreadsheet(spreadsheetKey)
-  // We use Service Account instead of API Key
-  this._sheet.useServiceAccountAuth(serviceAccountCredentials)
-  this._sheetsFilter = sheetsFilter
-  
+  this._sheetsFilter = sheetsFilter  
   this._fetchDeferred = Q.defer()
   this._isFetching = false
   this._fetchedWorksheets = null
 }
 
+GSReader.prototype.init = async function (serviceAccountCredentials) {
+  await this._sheet.useServiceAccountAuth(serviceAccountCredentials)
+  await this._sheet.loadInfo()
+}
+
 GSReader.builder = async function(serviceAccountCredentialsFilePath, spreadsheetKey, sheetsFilter) {
   const creds = require(serviceAccountCredentialsFilePath)
-  const reader = new GSReader(creds, spreadsheetKey, sheetsFilter)
+  const reader = new GSReader(spreadsheetKey, sheetsFilter)
+  await reader.init(creds)
   return reader
 }
 

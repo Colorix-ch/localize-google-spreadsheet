@@ -2,7 +2,7 @@
   "author": "Michael Caraccio <michael.caraccio@colorix.com>",
   "name": "@colorix/localize-google-spreadsheet",
   "description": "Create a localization file in Android or iOS format from a Google Spreadsheet. Fork from version 2 by Pavel Sorokin",
-  "version": "3.5.2",
+  "version": "3.5.3",
   "homepage": "https://github.com/Colorix-ch/localize-google-spreadsheet",
   "repository": {
     "type": "git",
