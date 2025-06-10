@@ -10,9 +10,10 @@
   },
   "main": "index.js",
   "dependencies": {
+    "google-auth-library": "^9.15.1",
     "google-spreadsheet": "^4.1.4",
-    "q": "^2.0.3",
-    "mkpath": "^1.0.0"
+    "mkpath": "^1.0.0",
+    "q": "^2.0.3"
   },
   "scripts": {
     "test": "./tests/all.js"
@@ -24,7 +25,6 @@
     "doc": "doc",
     "test": "tests"
   },
-  "devDependencies": {},
   "keywords": [
     "google",
     "spreadsheets",

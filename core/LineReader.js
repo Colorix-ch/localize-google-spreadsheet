@@ -1,19 +1,26 @@
 const Line = require('./Line.js')
-const { GoogleSpreadsheet } = require('google-spreadsheet')
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 const Q = require('q')
+const { JWT } = require('google-auth-library');
 
 const GSReader = function (spreadsheetKey, sheetsFilter) {
-  this._sheet = new GoogleSpreadsheet(spreadsheetKey)
-  this._sheetsFilter = sheetsFilter  
-  this._fetchDeferred = Q.defer()
-  this._isFetching = false
-  this._fetchedWorksheets = null
-}
+  this._spreadsheetKey = spreadsheetKey; // Save key temporarily
+  this._sheetsFilter = sheetsFilter;
+  this._fetchDeferred = Q.defer();
+  this._isFetching = false;
+  this._fetchedWorksheets = null;
+};
 
 GSReader.prototype.init = async function (serviceAccountCredentials) {
-  await this._sheet.useServiceAccountAuth(serviceAccountCredentials)
-  await this._sheet.loadInfo()
-}
+  const authClient = new JWT({
+    email: serviceAccountCredentials.client_email,
+    key: serviceAccountCredentials.private_key,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+
+  this._sheet = new GoogleSpreadsheet(this._spreadsheetKey, authClient);
+  await this._sheet.loadInfo();
+};
 
 GSReader.builder = async function(serviceAccountCredentialsFilePath, spreadsheetKey, sheetsFilter) {
   const creds = require(serviceAccountCredentialsFilePath)
@@ -28,15 +35,6 @@ GSReader.prototype.fetchAllCells = async function() {
   if (self._fetchedWorksheets == null) {
     if (!self._isFetching) {
       self._isFetching = true
-
-      try {
-            await self._sheet.loadInfo()
-      } catch (err) {
-        console.error('Error while fetching the Spreadsheet (' + err + ')')
-        console.warn('WARNING! Check that your spreadsheet is "Published" in "File > Publish to the web..."')
-
-        self._fetchDeferred.reject(err)
-      }
 
       const sheets = self._sheet.sheetsByIndex
 
@@ -154,7 +152,7 @@ const WorksheetReader = function(filterSheets, worksheets) {
   this._data = []
 }
 
-WorksheetReader.prototype.next = async function() {
+WorksheetReader.prototype.next = async function () {
   const self = this;
 
   if (this._index < this._worksheets.length) {
@@ -163,21 +161,36 @@ WorksheetReader.prototype.next = async function() {
 
     if (GSReader.shouldUseWorksheet(this._filterSheets, currentWorksheet.title, index)) {
       try {
-        await currentWorksheet.loadCells()
+        await currentWorksheet.loadCells();
 
-        self._data.push(currentWorksheet._cells)
+        const maxRows = currentWorksheet.rowCount;
+        const maxCols = currentWorksheet.columnCount;
+
+        const rows = [];
+
+        for (let r = 0; r < maxRows; r++) {
+          const row = [];
+          for (let c = 0; c < maxCols; c++) {
+            const cell = currentWorksheet.getCell(r, c);
+            row.push(cell);
+          }
+          rows.push(row);
+        }
+
+        self._data.push(rows);
       } catch (err) {
-        console.error(err)
+        console.error(err);
       }
 
-      return self.next()
+      return self.next();
     } else {
-      return this.next()
+      return self.next();
     }
   } else {
-    return this._data
+    return this._data;
   }
-}
+};
+
 
 var FakeReader = function(array) {
   this._array = array;
