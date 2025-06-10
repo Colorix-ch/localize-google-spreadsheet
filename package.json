@@ -10,9 +10,9 @@
   },
   "main": "index.js",
   "dependencies": {
-    "google-spreadsheet": "3.1.15",
-    "q": "0.9.2",
-    "mkpath": "0.1.0"
+    "google-spreadsheet": "^4.1.4",
+    "q": "^2.0.3",
+    "mkpath": "^1.0.0"
   },
   "scripts": {
     "test": "./tests/all.js"
